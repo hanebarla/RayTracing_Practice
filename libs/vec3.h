@@ -98,6 +98,16 @@ Vec3 operator/(double k, const Vec3& v) {
     return Vec3(k / v.y, k / v.y, k / v.y);
 }
 
+// 比較演算子
+bool operator==(const Vec3& a, const Vec3& b){
+    if(a.x==b.x && a.y==b.y && a.z==b.z){
+        return true;
+    }
+    else{
+        return false;
+    }
+}
+
 // 内積
 double dot(const Vec3& v1, const Vec3& v2) {
     return v1.x * v2.x + v1.y * v2.y + v1.z * v2.z;

@@ -14,6 +14,16 @@ class Object {
     virtual bool intersect(const Ray& ray, Hit& hit) {return false;};
 };
 
+
+/*
+球オブジェクト
+-----------
+メンバ変数
+    Vec3 center: 中心座標
+    double radius: 半径
+    Material _material: マテリアル
+    Light _light: 放射
+*/
 class Sphere : public Object {
    public:
     Vec3 center;
@@ -63,12 +73,15 @@ class Sphere : public Object {
     };
 };
 
+// 平面オブジェクト
 class Plane : public Object {
    public:
     Vec3 center;
     Vec3 edge1;
     Vec3 edge2;
     Vec3 origin;
+    Vec3 normal1;
+    Vec3 normal2;
     double length;
     std::shared_ptr<Material> material;
     std::shared_ptr<Light> light;
@@ -85,6 +98,8 @@ class Plane : public Object {
               edge1 = normalize(edge1);
               edge2 = normalize(edge2);
               origin = center - edge1*(length/2) - edge2*(length/2);
+              normal1 = cross(edge1, edge2);
+              normal2 = cross(edge2, edge1);
           };
 
     bool intersect(const Ray& ray, Hit& res) const {
@@ -92,7 +107,25 @@ class Plane : public Object {
         double alpha = answer[0];
         double beta = answer[1];
         double t = answer[2];
-        std::cout << "alpha: " << alpha << ", beta: " << beta << ", t: " << t << std::endl;
+
+        if((alpha > length) | (beta > length)){
+            return false;
+        }
+
+        if(t < 0){
+            return false;
+        }
+
+        Vec3 normal = normal1;
+        double theta = dot(normal, ray.direction);
+        if(theta <= 0.0){
+            normal = normal2;
+        }
+
+        res.t = t;
+        res.hitpos = ray(t);
+        res.hitNormal = normalize(normal);
+        res.hitPlane = this;
         return true;
     }
 };

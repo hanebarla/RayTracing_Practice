@@ -4,6 +4,7 @@
 
 
 class Sphere;
+class Plane;
 
 
 class Hit {
@@ -11,7 +12,8 @@ class Hit {
         double t;
         Vec3 hitpos;
         Vec3 hitNormal;
-        const Sphere* hitSphere;
+        const Sphere* hitSphere = nullptr;
+        const Plane* hitPlane = nullptr;
 
         Hit(){
             t = 10000;
