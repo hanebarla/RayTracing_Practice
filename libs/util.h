@@ -55,4 +55,17 @@ std::vector<double> Cramer(const Vec3& origin, const Vec3& edge1,
     return answer;
 }
 
+std::vector<Vec3> CreateCubePos(const Vec3 center, const double length){
+    Vec3 c1 = center - Vec3(0, length/2, 0);
+    Vec3 c2 = center + Vec3(0, length/2, 0);
+    Vec3 c3 = center - Vec3(length/2, 0, 0);
+    Vec3 c4 = center + Vec3(length/2, 0, 0);
+    Vec3 c5 = center - Vec3(0, 0, length/2);
+    Vec3 c6 = center + Vec3(0, 0, length/2);
+
+    std::vector<Vec3>CubePose = {c1, c2, c3, c4, c5, c6};
+
+    return CubePose;
+}
+
 #endif

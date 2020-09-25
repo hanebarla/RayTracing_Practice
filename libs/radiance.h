@@ -8,7 +8,34 @@
 const int MAX_DEPTH = 500;
 const double ROULETTE = 0.9;
 
-Vec3 radiance(const Ray &init_ray, const Aggregate &aggregate, const Vec3& sky = Vec3(1)) {
+Vec3 cala_col(int mode, const Hit res, Vec3 throughput){
+    if(mode==0){
+        auto hitMaterial = res.hitSphere->material;
+        auto hitLight = res.hitSphere->light;
+
+        return throughput * hitLight->Le();
+    }
+    else{
+        auto hitMaterial = res.hitPlane->material;
+        auto hitLight = res.hitPlane->light;
+
+        return throughput * hitLight->Le();
+    }
+}
+
+Vec3 cala_brdf(int mode, const Hit res, Vec3& wo_local, Vec3& wi_local, double& pdf){
+    if(mode==0){
+        auto hitMaterial = res.hitSphere->material;
+        return hitMaterial->sample(wo_local, wi_local, pdf);
+    }
+    else{
+        auto hitMaterial = res.hitPlane->material;
+        return hitMaterial->sample(wo_local, wi_local, pdf);
+    }
+}
+
+Vec3 radiance(const Ray &init_ray, const Aggregate &aggregate,
+              const Vec3 &sky = Vec3(1)) {
     Vec3 col;
     Vec3 throughput(1);
     Ray ray = init_ray;
@@ -17,23 +44,21 @@ Vec3 radiance(const Ray &init_ray, const Aggregate &aggregate, const Vec3& sky =
         Hit res;
 
         if (aggregate.intersect(ray, res)) {
+            int mode = res.object_mode();
             Vec3 n = res.hitNormal;
 
             Vec3 s, t;
             orthonormalBasis(n, s, t);
             Vec3 wo_local = worldToLocal(-ray.direction, s, n, t);
 
-            auto hitMaterial = res.hitSphere->material;
-            auto hitLight = res.hitSphere->light;
-
             // 発光
-            col += throughput * hitLight->Le();
+            col += cala_col(mode, res, throughput);
 
             // 方向のサンプリング
             Vec3 brdf;
             Vec3 wi_local;
             double pdf;
-            brdf = hitMaterial->sample(wo_local, wi_local, pdf);
+            brdf = cala_brdf(mode, res, wo_local, wi_local, pdf);
 
             double cos = cosTheta(wi_local);
             Vec3 wi = localToWorld(wi_local, s, n, t);

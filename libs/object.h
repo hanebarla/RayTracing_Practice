@@ -108,7 +108,11 @@ class Plane : public Object {
         double beta = answer[1];
         double t = answer[2];
 
-        if((alpha > length) | (beta > length)){
+        if((alpha > length) || (beta > length)){
+            return false;
+        }
+
+        if((alpha < 0) || (beta < 0)){
             return false;
         }
 
