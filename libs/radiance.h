@@ -4,6 +4,7 @@
 #include "hit.h"
 #include "ray.h"
 #include "vec3.h"
+#include "sky.h"
 
 const int MAX_DEPTH = 500;
 const double ROULETTE = 0.9;
@@ -34,8 +35,9 @@ Vec3 cala_brdf(int mode, const Hit res, Vec3& wo_local, Vec3& wi_local, double& 
     }
 }
 
+template <typename T>
 Vec3 radiance(const Ray &init_ray, const Aggregate &aggregate,
-              const Vec3 &sky = Vec3(1)) {
+              const T &sky ) {
     Vec3 col;
     Vec3 throughput(1);
     Ray ray = init_ray;
@@ -67,7 +69,7 @@ Vec3 radiance(const Ray &init_ray, const Aggregate &aggregate,
 
             ray = Ray(res.hitpos + 0.001 * res.hitNormal, wi);
         } else {
-            col += throughput * sky;
+            col += throughput * sky.getRadiance(ray);
             break;
         }
 
